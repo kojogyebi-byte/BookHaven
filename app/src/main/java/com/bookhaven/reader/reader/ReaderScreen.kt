@@ -48,6 +48,7 @@ fun ReaderScreen(
         BookFormat.PDF -> PdfReaderScreen(
             filePath = book.filePath,
             initialLocator = book.locator,
+            prefs = prefs,
             onBack = onBack,
             onProgress = onProgress
         )

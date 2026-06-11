@@ -1,8 +1,10 @@
 # BookHaven 📚
 
+*Created by Kwadwo Gyebi · Shamaapps*
+
 An Apple Books–style e-reader for Android. Clean library shelf, distraction-free
-reader, adjustable fonts and page themes (White / Sepia / Gray / Night), and
-resume-where-you-left-off progress tracking.
+reader, multiple typefaces and sizes, four page themes (White / Sepia / Gray /
+Night), a light/dark app toggle, and resume-where-you-left-off progress tracking.
 
 Built with Kotlin + Jetpack Compose (Material 3).
 
@@ -67,10 +69,17 @@ your own signing key for Play Store distribution.
 
 - **Add books:** tap the **Add Book** button and pick one or more files. You can
   also open a supported file from any file manager and choose BookHaven.
+- **Light / dark app theme:** tap the sun/moon icon at the top of the Library to
+  switch the whole interface between light and dark. Your choice is remembered.
 - **Read:** tap a cover. Tap left/right edges (or swipe) to turn pages; tap the
   centre to show/hide the toolbar.
-- **Adjust:** tap **Aa** in the reader to change font size, page theme, and
-  (for EPUB) paged vs. scrolling layout.
+- **Fonts & themes:** tap **Aa** in the reader to change the typeface
+  (Original, Serif, Sans Serif, Slab, Mono), the text size, and the page color
+  (White / Sepia / Gray / Night).
+- **PDFs read like EPUBs:** the same Aa toolbar, tap-to-turn page zones, and the
+  four page-color themes all work on PDFs too. Because a PDF's text is baked into
+  each page image, font and size can't be changed for PDFs — but the page-color
+  themes (including a true Night mode) recolor the page so it reads the same way.
 - **Resume:** progress is saved automatically; the **Reading Now** row shows
   books in progress.
 

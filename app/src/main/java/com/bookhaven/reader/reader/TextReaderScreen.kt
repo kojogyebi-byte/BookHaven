@@ -32,6 +32,7 @@ fun TextReaderScreen(
 ) {
     var theme by remember { mutableStateOf(prefs.pageTheme) }
     var fontScale by remember { mutableIntStateOf(prefs.fontScale) }
+    var font by remember { mutableStateOf(prefs.font) }
     var chromeVisible by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
 
@@ -80,6 +81,7 @@ fun TextReaderScreen(
                 Text(
                     text = content,
                     color = theme.text,
+                    fontFamily = font.composeFamily,
                     fontSize = (17 * fontScale / 100).sp,
                     lineHeight = (17 * fontScale / 100 * prefs.lineHeight).sp,
                     textAlign = TextAlign.Justify,
@@ -123,9 +125,10 @@ fun TextReaderScreen(
 
         if (showSettings) {
             AaSettingsSheet(
-                prefs = prefs, currentTheme = theme, fontScale = fontScale,
+                prefs = prefs, currentTheme = theme, fontScale = fontScale, currentFont = font,
                 onThemeChange = { theme = it; prefs.pageTheme = it },
                 onFontChange = { fontScale = it; prefs.fontScale = it },
+                onFontFamilyChange = { font = it; prefs.font = it },
                 showLayoutToggle = false,
                 onDismiss = { showSettings = false }
             )

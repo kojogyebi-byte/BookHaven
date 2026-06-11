@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,8 +33,29 @@ class MainActivity : ComponentActivity() {
         handleIncomingIntent(intent)
 
         setContent {
-            BookHavenTheme {
-                BookHavenApp(pendingViewUri)
+            val ctx = this
+            var themeMode by androidx.compose.runtime.remember {
+                androidx.compose.runtime.mutableStateOf(
+                    com.bookhaven.reader.ui.theme.AppPrefs.themeMode(ctx)
+                )
+            }
+            val dark = when (themeMode) {
+                com.bookhaven.reader.ui.theme.ThemeMode.LIGHT -> false
+                com.bookhaven.reader.ui.theme.ThemeMode.DARK -> true
+                com.bookhaven.reader.ui.theme.ThemeMode.SYSTEM ->
+                    androidx.compose.foundation.isSystemInDarkTheme()
+            }
+            BookHavenTheme(darkTheme = dark) {
+                BookHavenApp(
+                    pendingViewUri = pendingViewUri,
+                    isDark = dark,
+                    onToggleTheme = {
+                        val next = if (dark) com.bookhaven.reader.ui.theme.ThemeMode.LIGHT
+                        else com.bookhaven.reader.ui.theme.ThemeMode.DARK
+                        themeMode = next
+                        com.bookhaven.reader.ui.theme.AppPrefs.setThemeMode(ctx, next)
+                    }
+                )
             }
         }
     }
@@ -66,7 +88,11 @@ private object Routes {
 }
 
 @Composable
-private fun BookHavenApp(pendingViewUri: MutableStateFlow<Uri?>) {
+private fun BookHavenApp(
+    pendingViewUri: MutableStateFlow<Uri?>,
+    isDark: Boolean,
+    onToggleTheme: () -> Unit
+) {
     val nav = rememberNavController()
     val vm: LibraryViewModel = viewModel()
     val books by vm.books.collectAsState()
@@ -102,6 +128,8 @@ private fun BookHavenApp(pendingViewUri: MutableStateFlow<Uri?>) {
             LibraryScreen(
                 books = books,
                 importing = importing,
+                isDark = isDark,
+                onToggleTheme = onToggleTheme,
                 onOpenBook = { book -> nav.navigate(Routes.reader(book.id)) },
                 onImport = {
                     picker.launch(

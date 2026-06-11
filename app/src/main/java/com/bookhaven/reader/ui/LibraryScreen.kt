@@ -11,7 +11,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bookhaven.reader.data.Book
@@ -29,6 +32,8 @@ import com.bookhaven.reader.ui.components.BookCover
 fun LibraryScreen(
     books: List<Book>,
     importing: Boolean,
+    isDark: Boolean,
+    onToggleTheme: () -> Unit,
     onOpenBook: (Book) -> Unit,
     onImport: () -> Unit,
     onDelete: (Book) -> Unit
@@ -73,11 +78,22 @@ fun LibraryScreen(
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Column {
                     Spacer(Modifier.statusBarsPadding())
-                    Text(
-                        "Library",
-                        style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            "Library",
+                            style = MaterialTheme.typography.headlineLarge,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(top = 8.dp, bottom = 12.dp)
+                        )
+                        IconButton(onClick = onToggleTheme) {
+                            Icon(
+                                imageVector = if (isDark) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                contentDescription = if (isDark) "Switch to light mode" else "Switch to dark mode",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
                     OutlinedTextField(
                         value = query,
                         onValueChange = { query = it },
@@ -156,6 +172,18 @@ fun LibraryScreen(
                         Text("Remove", style = MaterialTheme.typography.labelMedium)
                     }
                 }
+            }
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Text(
+                    "Created by Kwadwo Gyebi · Shamaapps",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp, bottom = 4.dp)
+                )
             }
         }
     }

@@ -46,6 +46,7 @@ fun EpubReaderScreen(
 
     var theme by remember { mutableStateOf(prefs.pageTheme) }
     var fontScale by remember { mutableIntStateOf(prefs.fontScale) }
+    var font by remember { mutableStateOf(prefs.font) }
     var paged by remember { mutableStateOf(prefs.paged) }
     var chromeVisible by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
@@ -78,7 +79,7 @@ fun EpubReaderScreen(
         chapterIndex = index.coerceIn(0, epub.chapterCount - 1)
         pendingPage = restore
         val wv = webViewRef.value ?: return
-        val html = buildEpubHtml(epub.chapterHtml(chapterIndex), theme, fontScale, prefs.lineHeight, paged)
+        val html = buildEpubHtml(epub.chapterHtml(chapterIndex), theme, fontScale, prefs.lineHeight, paged, font)
         wv.loadDataWithBaseURL(epub.chapterBaseUrl(chapterIndex), html, "text/html", "UTF-8", null)
     }
 
@@ -130,7 +131,7 @@ fun EpubReaderScreen(
                         }
                     }
                     webViewRef.value = this
-                    val html = buildEpubHtml(epub.chapterHtml(chapterIndex), theme, fontScale, prefs.lineHeight, paged)
+                    val html = buildEpubHtml(epub.chapterHtml(chapterIndex), theme, fontScale, prefs.lineHeight, paged, font)
                     loadDataWithBaseURL(epub.chapterBaseUrl(chapterIndex), html, "text/html", "UTF-8", null)
                 }
             }
@@ -185,8 +186,10 @@ fun EpubReaderScreen(
                 prefs = prefs,
                 currentTheme = theme,
                 fontScale = fontScale,
+                currentFont = font,
                 onThemeChange = { theme = it; prefs.pageTheme = it; loadChapter(chapterIndex, currentPage) },
                 onFontChange = { fontScale = it; prefs.fontScale = it; loadChapter(chapterIndex, currentPage) },
+                onFontFamilyChange = { font = it; prefs.font = it; loadChapter(chapterIndex, currentPage) },
                 paged = paged,
                 onPagedChange = { paged = it; prefs.paged = it; loadChapter(chapterIndex, 0) },
                 onDismiss = { showSettings = false }
@@ -233,8 +236,10 @@ private fun ReaderError(onBack: () -> Unit) {
 
 /** Wraps chapter XHTML with theme CSS + pagination JS. */
 private fun buildEpubHtml(
-    raw: String, theme: PageTheme, fontScale: Int, lineHeight: Float, paged: Boolean
+    raw: String, theme: PageTheme, fontScale: Int, lineHeight: Float, paged: Boolean, font: ReaderFont
 ): String {
+    val fontRule = if (font == ReaderFont.ORIGINAL) ""
+        else "font-family: ${font.cssStack} !important;"
     val css = """
         <style id="bh-style">
         html { -webkit-text-size-adjust: none; }
@@ -243,10 +248,12 @@ private fun buildEpubHtml(
             color: ${theme.cssText} !important;
             font-size: ${fontScale}% !important;
             line-height: ${lineHeight} !important;
+            $fontRule
             text-align: justify;
             -webkit-hyphens: auto; hyphens: auto;
             word-wrap: break-word;
         }
+        p, div, span, li, a, h1, h2, h3, h4, h5, h6 { ${if (font == ReaderFont.ORIGINAL) "" else "font-family: ${font.cssStack} !important;"} }
         img, svg, image { max-width: 100% !important; height: auto !important; }
         a { color: inherit !important; text-decoration: none; }
         p { margin: 0 0 0.8em 0; }
